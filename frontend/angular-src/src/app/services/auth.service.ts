@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpResponse} from "@angular/common/http";
 import 'rxjs/Rx';
-import { map } from "rxjs/operators";
 import { Observable } from 'rxjs/Observable';
+import {tokenNotExpired} from 'angular2-jwt';
 
 import { UserModel } from "../models/user.model";
 
@@ -13,6 +13,7 @@ export class AuthService {
 
   constructor(private http:HttpClient) { }
 
+  // Add user in storage
   registerUser(user): Observable<UserModel> {
     let headers = new HttpHeaders({
       'Content-Type':'application/json'
@@ -20,6 +21,7 @@ export class AuthService {
     return this.http.post<UserModel>('http://localhost:3000/users/register', user, {headers: headers});
   }
 
+  // Check if user exist
   authenticateUser(user): Observable<UserModel> {
     let headers = new HttpHeaders({
       'Content-Type': 'application/json'
@@ -27,12 +29,13 @@ export class AuthService {
     return this.http.post<UserModel>('http://localhost:3000/users/authenticate', user, {headers: headers});
   }
 
-  getProfile() {
+  // Get profil of user
+  getProfile(): Observable<UserModel> {
     let headers = new HttpHeaders();
     this.loadToken();
     headers.append('Authorization', this.authToken);
     headers.append('Content-Type', 'application/json');
-    return this.http.get('http://localhost:3000/users/profile', {headers: headers});
+    return this.http.get<UserModel>('http://localhost:3000/users/profile', {headers: headers});
   }
 
   storeUserData(token: string, user: object) {
@@ -45,6 +48,10 @@ export class AuthService {
   loadToken() {
     const token = localStorage.getItem('id_token');
     this.authToken = token;
+  }
+
+  loggedIn() {
+    return tokenNotExpired();
   }
 
   logout() {
