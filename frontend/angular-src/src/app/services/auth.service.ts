@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from "@angular/common/http";
-import 'rxjs/add/operator/map';
+import {HttpClient, HttpHeaders, HttpResponse} from "@angular/common/http";
+import 'rxjs/Rx';
+import { map } from "rxjs/operators";
+import { Observable } from 'rxjs/Observable';
+
+import { UserModel } from "../models/user.model";
 
 @Injectable()
 export class AuthService {
@@ -9,19 +13,18 @@ export class AuthService {
 
   constructor(private http:HttpClient) { }
 
-  registerUser(user) {
+  registerUser(user): Observable<UserModel> {
     let headers = new HttpHeaders({
       'Content-Type':'application/json'
     });
-    return this.http.post('http://localhost:3000/users/register', user, {headers: headers});
+    return this.http.post<UserModel>('http://localhost:3000/users/register', user, {headers: headers});
   }
 
-  authenticateUser(user) {
+  authenticateUser(user): Observable<UserModel> {
     let headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
-    return this.http.post('http://localhost:3000/users/authenticate', user, {headers: headers})
-      .map(res => res.json());
+    return this.http.post<UserModel>('http://localhost:3000/users/authenticate', user, {headers: headers});
   }
 
   getProfile() {
@@ -32,11 +35,11 @@ export class AuthService {
     return this.http.get('http://localhost:3000/users/profile', {headers: headers});
   }
 
-  storeUserData(token, user) {
-    localStorage.setItem('id_token', token);
-    localStorage.setItem('user', JSON.stringify(user));
+  storeUserData(token: string, user: object) {
     this.authToken = token;
     this.user = user;
+    localStorage.setItem('id_token', token);
+    localStorage.setItem('user', JSON.stringify(user));
   }
 
   loadToken() {
