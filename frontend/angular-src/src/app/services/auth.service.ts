@@ -31,13 +31,13 @@ export class AuthService {
   }
 
   // Get profile of user
-  getProfile(): Observable<LocalUserModel> {
+  getProfile() {
     this.onLoadUserData();
     let headers = new HttpHeaders({
       'Authorization': this.authToken,
       'Content-type': 'application/json'
     });
-    return this.http.get<LocalUserModel>('http://localhost:3000/users/profile', {headers: headers});
+    return this.http.get('http://localhost:3000/users/profile', {headers: headers});
   }
 
   storeUserData(token: string, user: object) {
@@ -53,7 +53,7 @@ export class AuthService {
   }
 
   loggedIn() {
-    return true;
+    return tokenNotExpired('id_token');
   }
 
   logout() {
